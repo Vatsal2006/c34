@@ -1,13 +1,17 @@
-var ball;
-
+var hball;
+var database,position;
 function setup(){
+    database = firebase.database();
     createCanvas(500,500);
-    ball = createSprite(250,250,10,10);
-    ball.shapeColor = "red";
+    hball = createSprite(250,250,10,10);
+    hball.shapeColor = "red";
+    var hballposition = database.ref('ball/position');
+    hballposition.on("value",readposition,showerror);
 }
 
 function draw(){
     background("white");
+    if(position !== undefined){
     if(keyDown(LEFT_ARROW)){
         changePosition(-1,0);
     }
@@ -22,8 +26,22 @@ function draw(){
     }
     drawSprites();
 }
-
+}
 function changePosition(x,y){
-    ball.x = ball.x + x;
-    ball.y = ball.y + y;
+    hball.x = hball.x + x;
+    hball.y = hball.y + y;
+}
+function readposition(data){
+    position = data.val();
+    hball.x = position.x;
+    hball.y = position.y;
+}
+function writeposition(x,y){
+    database.ref('ball.position').set({
+        'x':position.x + x,
+        'y':position.y + y
+    })
+}
+function showerror(){
+    console.log('unable to work try reconnecting');
 }
